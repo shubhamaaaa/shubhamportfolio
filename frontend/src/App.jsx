@@ -12,7 +12,7 @@ import './App.css';
 import project1 from './assets/MyinnersideGroup4.jpeg';
 import project2 from './assets/1.jpg';
 import project3 from './assets/BG.jpg';
-import project4 from './assets/Home1.jpg';
+import project4 from './assets/HOME1.jpg';
 import project5 from './assets/Home-banner-1.webp';
 import project6 from './assets/shanupg.jpeg';
 
