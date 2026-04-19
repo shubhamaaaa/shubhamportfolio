@@ -267,7 +267,7 @@ function App() {
                 <h3>Web Designer</h3>
                 <h4>Recreators Design and Media Pvt. Ltd.</h4>
               </div>
-              <span className="experience-date">Feb 2025 – Present</span>
+              <span className="experience-date">Nov 2024 – Present</span>
             </div>
             <ul>
               <li>Designed and developed multiple web projects using MERN Stack and Shopify.</li>
@@ -676,7 +676,7 @@ function App() {
             </div>
           </div>
           <div className="footer-bottom">
-            <p>&copy; 2025 Shubham Shukla. All Rights Reserved.</p>
+            <p>&copy; 2026 Shubham Shukla. All Rights Reserved.</p>
           </div>
         </div>
       </footer>
