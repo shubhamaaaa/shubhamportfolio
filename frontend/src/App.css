@@ -382,6 +382,7 @@ section {
   grid-template-columns: 1fr 1fr;
   gap: 50px;
   align-items: center;
+   text-align: justify;
 }
 
 .about-text h3 {
@@ -470,6 +471,7 @@ section {
   margin-bottom: 30px;
   border-left: 4px solid var(--primary);
   transition: transform 0.3s ease;
+   text-align: justify;
 }
 
 .experience-item:hover {
@@ -1055,4 +1057,32 @@ footer .social-links a:hover {
   .floating-element {
     display: none;
   }
+}
+
+
+
+
+
+
+
+
+
+
+
+.highlight-text {
+  color:  #000000;
+  font-weight: 500;
+  position: relative;
+  /* display: inline-block; */
+}
+
+.highlight-text::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  width: 100%;
+  /* height: 1px; */
+  /* background: #000000; */
+  /* border-radius: 10px; */
 }

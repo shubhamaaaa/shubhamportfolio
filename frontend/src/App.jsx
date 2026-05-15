@@ -197,87 +197,226 @@ function App() {
         </div>
       </section>
 
-      {/* About Section */}
-      <section id="about" className="about">
-        <div className="container">
-          <div className="section-title">
-            <h2>About Me</h2>
-            <p>Get to know me better</p>
-          </div>
-          <div className="about-content">
-            <div className="about-text">
-              <h3>Hello! I'm Shubham Shukla</h3>
-              <p>I'm a passionate Full Stack Developer and Web Designer with experience in building modern, responsive websites and applications. I specialize in MERN stack development and have worked on various e-commerce projects with secure payment integrations.</p>
-              <p>My approach combines technical expertise with creative design to deliver solutions that are both functional and visually appealing. I enjoy solving complex problems and continuously learning new technologies.</p>
-              <div className="about-stats">
-                <div className="stat">
-                  <span className="stat-number">250+</span>
-                  <span className="stat-label">DSA Problems Solved</span>
-                </div>
-                <div className="stat">
-                  <span className="stat-number">5★</span>
-                  <span className="stat-label">HackerRank Java</span>
-                </div>
-                <div className="stat">
-                  <span className="stat-number">5★</span>
-                  <span className="stat-label">HackerRank SQL</span>
-                </div>
-              </div>
-            </div>
-            <div className="about-info">
-              <div className="info-item">
-                <FaGraduationCap className="info-icon" />
-                <h4>Education</h4>
-                <p>B.Tech in Computer Science</p>
-                <p className="highlight">69.4%</p>
-              </div>
-              <div className="info-item">
-                <FaBriefcase className="info-icon" />
-                <h4>Experience</h4>
-                <p>Web Designer</p>
-                <p className="highlight">Recreators Design</p>
-              </div>
-              <div className="info-item">
-                <FaCode className="info-icon" />
-                <h4>Technologies</h4>
-                <p>MERN Stack</p>
-                <p className="highlight">Shopify</p>
-              </div>
-              <div className="info-item">
-                <FaStar className="info-icon" />
-                <h4>Achievements</h4>
-                <p>5★ HackerRank</p>
-                <p className="highlight">Java & SQL</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+     {/* About Section */}
+<section id="about" className="about">
+  <div className="container">
+    <div className="section-title">
+      <h2>About Me</h2>
+      <p>Passionate about building scalable digital experiences</p>
+    </div>
 
-      {/* Experience Section */}
-      <section id="experience" className="experience">
-        <div className="container">
-          <div className="section-title">
-            <h2>My Experience</h2>
-            <p>My professional journey</p>
+    <div className="about-content">
+      <div className="about-text">
+        <h3>
+          Hello! I'm <span className="highlight-text">Shubham Shukla</span>
+        </h3>
+
+        <p>
+          I'm a passionate{" "}
+          <span className="highlight-text">
+            Full Stack Developer
+          </span>{" "}
+          and{" "}
+          <span className="highlight-text">
+            Web Designer
+          </span>{" "}
+          specializing in modern, scalable, and{" "}
+          <span className="highlight-text">
+            high-performance web applications
+          </span>.
+          With strong expertise in the{" "}
+          <span className="highlight-text">MERN Stack</span>,{" "}
+          <span className="highlight-text">Next.js</span>,{" "}
+          <span className="highlight-text">Shopify</span>, and responsive{" "}
+          <span className="highlight-text">UI/UX design</span>, I create
+          digital products that combine functionality, performance, and
+          exceptional user experience.
+        </p>
+
+        <p>
+          I have hands-on experience developing{" "}
+          <span className="highlight-text">
+            production-ready e-commerce platforms
+          </span>,
+          business websites, admin dashboards, and custom web solutions with{" "}
+          <span className="highlight-text">
+            secure payment integrations
+          </span>,
+          optimized backend architectures, and{" "}
+          <span className="highlight-text">
+            SEO-focused frontend development
+          </span>.
+          My goal is to build impactful applications that help businesses grow
+          efficiently in the digital space.
+        </p>
+
+        <p>
+          I continuously explore modern technologies and best development
+          practices to deliver{" "}
+          <span className="highlight-text">
+            clean, maintainable, and future-ready solutions
+          </span>{" "}
+          while solving complex technical challenges with creativity and
+          precision.
+        </p>
+
+        <div className="about-stats">
+          <div className="stat">
+            <span className="stat-number highlight-text">250+</span>
+            <span className="stat-label">DSA Problems Solved</span>
           </div>
-          <div className="experience-item">
-            <div className="experience-header">
-              <div>
-                <h3>Web Designer</h3>
-                <h4>Recreators Design and Media Pvt. Ltd.</h4>
-              </div>
-              <span className="experience-date">Feb 2025 – Present</span>
-            </div>
-            <ul>
-              <li>Designed and developed multiple web projects using MERN Stack and Shopify.</li>
-              <li>Built e-commerce websites with features like product management, secure payment integration (Stripe, Razorpay, COD), and responsive UIs.</li>
-              <li>Designed and deployed Shopify websites, including Flickemart.</li>
-              <li>Collaborated with cross-functional teams to deliver high-quality websites within deadlines.</li>
-            </ul>
+
+          <div className="stat">
+            <span className="stat-number highlight-text">32+</span>
+            <span className="stat-label">Projects Built</span>
+          </div>
+
+          <div className="stat">
+            <span className="stat-number highlight-text">5★</span>
+            <span className="stat-label">HackerRank Java & SQL</span>
           </div>
         </div>
-      </section>
+      </div>
+
+      <div className="about-info">
+        <div className="info-item">
+          <FaGraduationCap className="info-icon" />
+          <h4>Education</h4>
+          <p>B.Tech in Computer Science</p>
+          <p className="highlight">Strong Technical Foundation</p>
+        </div>
+
+        <div className="info-item">
+          <FaBriefcase className="info-icon" />
+          <h4>Experience</h4>
+          <p>Full Stack Developer & Web Designer</p>
+          <p className="highlight">Recreators Design</p>
+        </div>
+
+        <div className="info-item">
+          <FaCode className="info-icon" />
+          <h4>Core Technologies</h4>
+          <p>MERN Stack, Next.js</p>
+          <p className="highlight">Shopify & Tailwind CSS</p>
+        </div>
+
+        <div className="info-item">
+          <FaStar className="info-icon" />
+          <h4>Achievements</h4>
+          <p>5★ HackerRank Ratings</p>
+          <p className="highlight">Java & SQL</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{/* Experience Section */}
+<section id="experience" className="experience">
+  <div className="container">
+    <div className="section-title">
+      <h2>My Experience</h2>
+      <p>Professional journey and real-world development experience</p>
+    </div>
+
+    <div className="experience-item">
+      <div className="experience-header">
+        <div>
+          <h3>
+            <span className="highlight-text">
+              Full Stack Developer & Web Designer
+            </span>
+          </h3>
+
+          <h4>
+            <span className="highlight-text">
+              Recreators Design and Media Pvt. Ltd.
+            </span>
+          </h4>
+        </div>
+
+        <span className="experience-date">
+          Nov 2024 – Present
+        </span>
+      </div>
+
+      <ul>
+        <li>
+          Designed and developed scalable, high-performance web applications
+          using <span className="highlight-text">MERN Stack</span>,{" "}
+          <span className="highlight-text">Next.js</span>, and{" "}
+          <span className="highlight-text">Shopify</span> for diverse business
+          requirements.
+        </li>
+
+        <li>
+          Built modern e-commerce platforms with{" "}
+          <span className="highlight-text">
+            secure payment gateway integrations
+          </span>,
+          referral systems, automated workflows, and{" "}
+          <span className="highlight-text">
+            real-time SMS/WhatsApp notifications
+          </span>.
+        </li>
+
+        <li >
+          Optimized backend performance using{" "}
+          <span className="highlight-text">Redis caching</span>,{" "}
+          <span className="highlight-text">asynchronous job queues</span>, and
+          efficient database management techniques to improve scalability and
+          server efficiency.
+        </li>
+
+        <li>
+          Delivered production-ready{" "}
+          <span className="highlight-text">Shopify</span> and{" "}
+          <span className="highlight-text">React/Next.js</span> projects,
+          including{" "}
+          <span className="highlight-text">Flickemart</span> and{" "}
+          <span className="highlight-text">Riarmart</span>, while maintaining
+          high-quality development standards and timely delivery.
+        </li>
+
+        <li>
+          Developed secure{" "}
+          <span className="highlight-text">RESTful APIs</span>,
+          authentication systems,{" "}
+          <span className="highlight-text">
+            role-based access control
+          </span>,
+          and dynamic admin dashboards to streamline business operations.
+        </li>
+
+        <li>
+          Collaborated directly with clients and cross-functional teams to
+          transform business requirements into{" "}
+          <span className="highlight-text">
+            intuitive, user-centric digital solutions
+          </span>.
+        </li>
+
+        <li>
+          Improved website performance,{" "}
+          <span className="highlight-text">SEO</span>, responsiveness, and user
+          engagement through optimized frontend architecture using{" "}
+          <span className="highlight-text">React.js</span>,{" "}
+          <span className="highlight-text">Next.js</span>, and{" "}
+          <span className="highlight-text">Tailwind CSS</span>.
+        </li>
+
+        <li>
+          Demonstrated strong problem-solving abilities by debugging complex
+          technical issues and implementing{" "}
+          <span className="highlight-text">
+            scalable, reliable, and maintainable solutions
+          </span>{" "}
+          under tight deadlines.
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
 
       {/* Skills Section */}
       <section id="skills" className="skills">
@@ -676,7 +815,7 @@ function App() {
             </div>
           </div>
           <div className="footer-bottom">
-            <p>&copy; 2025 Shubham Shukla. All Rights Reserved.</p>
+            <p>&copy; 2026 Shubham Shukla. All Rights Reserved.</p>
           </div>
         </div>
       </footer>
