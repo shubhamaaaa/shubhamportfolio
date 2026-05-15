@@ -12,7 +12,7 @@ import './App.css';
 import project1 from './assets/MyinnersideGroup4.jpeg';
 import project2 from './assets/1.jpg';
 import project3 from './assets/BG.jpg';
-import project4 from './assets/Home1.jpg';
+import project4 from './assets/HOME1.jpg';
 import project5 from './assets/Home-banner-1.webp';
 import project6 from './assets/shanupg.jpeg';
 
@@ -199,7 +199,7 @@ function App() {
 
      {/* About Section */}
 <section id="about" className="about">
-  <div className="container">
+ <div className="container">
     <div className="section-title">
       <h2>About Me</h2>
       <p>Passionate about building scalable digital experiences</p>
@@ -274,6 +274,20 @@ function App() {
           <div className="stat">
             <span className="stat-number highlight-text">5★</span>
             <span className="stat-label">HackerRank Java & SQL</span>
+          <div className="experience-item">
+            <div className="experience-header">
+              <div>
+                <h3>Web Designer</h3>
+                <h4>Recreators Design and Media Pvt. Ltd.</h4>
+              </div>
+              <span className="experience-date">Nov 2024 – Present</span>
+            </div>
+            <ul>
+              <li>Designed and developed multiple web projects using MERN Stack and Shopify.</li>
+              <li>Built e-commerce websites with features like product management, secure payment integration (Stripe, Razorpay, COD), and responsive UIs.</li>
+              <li>Designed and deployed Shopify websites, including Flickemart.</li>
+              <li>Collaborated with cross-functional teams to deliver high-quality websites within deadlines.</li>
+            </ul>
           </div>
         </div>
       </div>
@@ -308,6 +322,7 @@ function App() {
         </div>
       </div>
     </div>
+  </div>
   </div>
 </section>
 
