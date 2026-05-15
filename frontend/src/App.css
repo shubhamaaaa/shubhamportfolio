@@ -382,7 +382,7 @@ section {
   grid-template-columns: 1fr 1fr;
   gap: 50px;
   align-items: center;
-   text-align: justify;
+  text-align: justify;
 }
 
 .about-text h3 {
