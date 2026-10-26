@@ -20,7 +20,10 @@ import project3 from './assets/BG.jpg';
 import project4 from './assets/HOME1.jpg';
 import project5 from './assets/Home-banner-1.webp';
 import project6 from './assets/shanupg.jpeg';
-
+import recreators from './assets/recreators.png'
+import burgshake from './assets/burgshake.png'
+import insight from './assets/insight.png'
+import neysa from './assets/neysa.png'
 /* ============================================================
    1. CUSTOM CURSOR (Smooth + Magnetic)
    ============================================================ */
@@ -359,15 +362,15 @@ const ProjectModal = ({ project, onClose }) => {
    9. DATA
    ============================================================ */
 const PROJECTS = [
-  { id: 1, title: 'Recreators', img: project2, link: 'https://recreators-main.vercel.app/', desc: 'AI-powered business platform with real-time video calling, live chat, and an intelligent RAG-based chatbot.', tech: ['Next.js', 'WebRTC', 'Socket.IO', 'RAG', 'MongoDB', 'Razorpay'], category: 'AI + Full Stack', featured: true, highlights: ['WebRTC video calling', 'Socket.IO real-time chat', 'RAG-powered AI chatbot', 'Razorpay payments', 'Analytics dashboard', 'Vercel deployment'] },
-  { id: 2, title: 'My Inner Side', img: project1, link: 'https://myinnerside.com/', desc: 'Mental wellness consultation platform connecting users with certified professionals through secure 1-on-1 sessions.', tech: ['React', 'MongoDB', 'Tailwind', 'Express', 'Razorpay'], category: 'Full Stack', featured: true, highlights: ['1-on-1 consultation booking', 'Razorpay integration', 'Professional onboarding', 'Session scheduling', 'Responsive across devices'] },
-  { id: 3, title: 'Rogue0707', img: project3, link: 'https://www.rogue0707.com/', desc: 'Modern fashion e-commerce with headless Shopify GraphQL backend and React-powered storefront.', tech: ['React', 'Shopify', 'GraphQL'], category: 'E-Commerce', featured: true, highlights: ['Headless Shopify store', 'GraphQL API', 'Optimized performance', 'Custom checkout', 'SEO pages'] },
+  { id: 1, title: 'Recreators', img: recreators, link: 'https://recreators-main.vercel.app/', desc: 'AI-powered business platform with real-time video calling, live chat, and an intelligent RAG-based chatbot.', tech: ['Next.js', 'WebRTC', 'Socket.IO', 'RAG', 'MongoDB', 'Razorpay'], category: 'AI + Full Stack', featured: true, highlights: ['WebRTC video calling', 'Socket.IO real-time chat', 'RAG-powered AI chatbot', 'Razorpay payments', 'Analytics dashboard', 'Vercel deployment'] },
   { id: 4, title: 'HealthStory', img: project4, link: 'https://healthstory.net.in/', desc: 'Wellness e-commerce with curated herbal catalog, secure payments, and subscription management.', tech: ['React', 'MongoDB', 'Express', 'Node'], category: 'E-Commerce', highlights: ['Curated wellness catalog', 'Secure checkout', 'Subscriptions', 'Order tracking'] },
   { id: 5, title: 'Prakritisa', img: project5, link: 'https://prakritisa.com/', desc: 'Natural botanical products e-commerce with responsive design and optimized checkout.', tech: ['React', 'MongoDB', 'Express', 'Node'], category: 'E-Commerce', highlights: ['Botanical catalog', 'Optimized checkout', 'Search & filters', 'Customer reviews'] },
   { id: 6, title: 'Ishmi Herbal', img: project2, link: 'https://ishmiherbal.com/', desc: 'Herbal marketplace with dynamic catalog, auth, and secure Razorpay integration.', tech: ['React', 'MongoDB', 'Tailwind', 'Express', 'Node'], category: 'E-Commerce', highlights: ['Dynamic catalog', 'Auth & profiles', 'Razorpay payments', 'Admin dashboard'] },
-  { id: 7, title: 'BurgShake', img: project6, link: 'https://burgshake.vercel.app/', desc: 'Modern food delivery brand website with animated menu, cart, and ordering flow.', tech: ['React', 'Vite', 'Tailwind'], category: 'Frontend', highlights: ['Animated menu', 'Interactive cart', 'Order flow', 'Mobile-first'] },
-  { id: 8, title: 'Warrior Beverages', img: project5, link: 'https://warriorbeverages.in/', desc: 'Corporate beverage brand website with product showcase and lead generation.', tech: ['React', 'Node', 'MongoDB'], category: 'Business', highlights: ['Product showcase', 'Lead capture', 'Brand storytelling', 'SEO-ready'] },
-  { id: 9, title: 'Insight Integrators', img: project4, link: 'https://insightintegrators.ae/', desc: 'UAE-based consulting firm website with modern UI, SEO, and analytics dashboard.', tech: ['Next.js', 'Tailwind', 'Node'], category: 'Business', highlights: ['Modern corporate UI', 'SEO pages', 'Analytics dashboard', 'Multi-language ready'] },
+  { id: 7, title: 'BurgShake', img: burgshake, link: 'https://burgshake.vercel.app/', desc: 'Modern food delivery brand website with animated menu, cart, and ordering flow.', tech: ['React', 'Vite', 'Tailwind'], category: 'Frontend', highlights: ['Animated menu', 'Interactive cart', 'Order flow', 'Mobile-first'] },
+  { id: 2, title: 'My Inner Side', img: project1, link: 'https://myinnerside.com/', desc: 'Mental wellness consultation platform connecting users with certified professionals through secure 1-on-1 sessions.', tech: ['React', 'MongoDB', 'Tailwind', 'Express', 'Razorpay'], category: 'Full Stack', featured: true, highlights: ['1-on-1 consultation booking', 'Razorpay integration', 'Professional onboarding', 'Session scheduling', 'Responsive across devices'] },
+  { id: 3, title: 'Rogue0707', img: project3, link: 'https://www.rogue0707.com/', desc: 'Modern fashion e-commerce with headless Shopify GraphQL backend and React-powered storefront.', tech: ['React', 'Shopify', 'GraphQL'], category: 'E-Commerce', featured: true, highlights: ['Headless Shopify store', 'GraphQL API', 'Optimized performance', 'Custom checkout', 'SEO pages'] },
+  { id: 8, title: 'Warrior Beverages', img: neysa, link: 'https://warriorbeverages.in/', desc: 'Corporate beverage brand website with product showcase and lead generation.', tech: ['React', 'Node', 'MongoDB'], category: 'Business', highlights: ['Product showcase', 'Lead capture', 'Brand storytelling', 'SEO-ready'] },
+  { id: 9, title: 'Insight Integrators', img: insight, link: 'https://insightintegrators.ae/', desc: 'UAE-based consulting firm website with modern UI, SEO, and analytics dashboard.', tech: ['Next.js', 'Tailwind', 'Node'], category: 'Business', highlights: ['Modern corporate UI', 'SEO pages', 'Analytics dashboard', 'Multi-language ready'] },
   { id: 10, title: 'ShanuPG', img: project6, link: 'https://shanupg-frontend.vercel.app/', desc: 'Responsive PG accommodation discovery platform with booking and filters.', tech: ['React', 'Vite', 'Tailwind'], category: 'Frontend', highlights: ['PG search & filters', 'Booking flow', 'Responsive UI', 'Vercel deploy'] },
 ];
 
