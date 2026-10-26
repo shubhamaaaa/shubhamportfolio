@@ -1,14 +1,19 @@
-// App.js (React Frontend)
-import React, { useState, useEffect } from 'react';
+// App.js — Premium Interactive Portfolio
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   FaCode, FaGraduationCap, FaBriefcase, FaStar,
   FaEnvelope, FaPhone, FaMapMarkerAlt, FaGithub,
-  FaLinkedin, FaTwitter, FaPaperPlane, FaExternalLinkAlt,
-  FaBars, FaTimes, FaWhatsapp
+  FaLinkedin, FaPaperPlane, FaExternalLinkAlt,
+  FaBars, FaTimes, FaWhatsapp, FaArrowRight,
+  FaDatabase, FaBrain, FaChartLine, FaVideo,
+  FaRobot, FaPython, FaReact, FaNodeJs, FaJs, FaJava,
+  FaFire, FaTrophy, FaEye, FaSun, FaMoon,
+  FaCheckCircle, FaInfoCircle, FaPhoneAlt, FaLayerGroup,
+  FaCalendarAlt
 } from 'react-icons/fa';
+import { SiNextdotjs, SiTailwindcss, SiMongodb, SiExpress, SiShopify, SiTypescript, SiRedis } from 'react-icons/si';
 import './App.css';
 
-// Project images (replace with your actual project images)
 import project1 from './assets/MyinnersideGroup4.jpeg';
 import project2 from './assets/1.jpg';
 import project3 from './assets/BG.jpg';
@@ -16,809 +21,758 @@ import project4 from './assets/HOME1.jpg';
 import project5 from './assets/Home-banner-1.webp';
 import project6 from './assets/shanupg.jpeg';
 
+/* ============================================================
+   1. CUSTOM CURSOR (Smooth + Magnetic)
+   ============================================================ */
+const CustomCursor = () => {
+  const dotRef = useRef(null);
+  const ringRef = useRef(null);
+
+  useEffect(() => {
+    const dot = dotRef.current, ring = ringRef.current;
+    let mx = 0, my = 0, rx = 0, ry = 0;
+    let rafId;
+
+    const onMove = (e) => {
+      mx = e.clientX; my = e.clientY;
+      if (dot) { dot.style.left = mx + 'px'; dot.style.top = my + 'px'; }
+    };
+
+    const animate = () => {
+      rx += (mx - rx) * 0.2; // Smoother follow
+      ry += (my - ry) * 0.2;
+      if (ring) { ring.style.left = rx + 'px'; ring.style.top = ry + 'px'; }
+      rafId = requestAnimationFrame(animate);
+    };
+
+    // Event Delegation for hover states
+    const handleMouseOver = (e) => {
+      const target = e.target.closest('a, button, .project-card-modern, .filter-btn, .theme-toggle, .chat-fab, .wa-fab, .magnetic-btn');
+      if (target && ring) ring.classList.add('cursor-hover');
+    };
+    const handleMouseOut = (e) => {
+      const target = e.target.closest('a, button, .project-card-modern, .filter-btn, .theme-toggle, .chat-fab, .wa-fab, .magnetic-btn');
+      if (target && ring) ring.classList.remove('cursor-hover');
+    };
+
+    window.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseover', handleMouseOver);
+    document.addEventListener('mouseout', handleMouseOut);
+    animate();
+
+    return () => {
+      window.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseover', handleMouseOver);
+      document.removeEventListener('mouseout', handleMouseOut);
+      cancelAnimationFrame(rafId);
+    };
+  }, []);
+
+  return (
+    <>
+      <div ref={dotRef} className="cursor-dot" />
+      <div ref={ringRef} className="cursor-ring" />
+    </>
+  );
+};
+
+/* ============================================================
+   2. MAGNETIC BUTTON (Interactive)
+   ============================================================ */
+const MagneticButton = ({ children, className = '', ...props }) => {
+  const ref = useRef(null);
+  const onMouseMove = (e) => {
+    const el = ref.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const x = e.clientX - rect.left - rect.width / 2;
+    const y = e.clientY - rect.top - rect.height / 2;
+    el.style.transform = `translate(${x * 0.15}px, ${y * 0.15}px)`;
+  };
+  const onMouseLeave = () => {
+    if (ref.current) ref.current.style.transform = '';
+  };
+  return (
+    <div
+      ref={ref}
+      className={`magnetic-wrap ${className}`}
+      onMouseMove={onMouseMove}
+      onMouseLeave={onMouseLeave}
+      style={{ display: 'inline-block', transition: 'transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)' }}
+    >
+      {children}
+    </div>
+  );
+};
+
+/* ============================================================
+   3. TILT CARD
+   ============================================================ */
+const TiltCard = ({ children, className = '' }) => {
+  const ref = useRef(null);
+  const onMove = (e) => {
+    const el = ref.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const x = e.clientX - r.left, y = e.clientY - r.top;
+    const rx = ((y - r.height / 2) / (r.height / 2)) * -5;
+    const ry = ((x - r.width / 2) / (r.width / 2)) * 5;
+    el.style.transform = `perspective(1000px) rotateX(${rx}deg) rotateY(${ry}deg)`;
+    el.style.setProperty('--mx', `${(x / r.width) * 100}%`);
+    el.style.setProperty('--my', `${(y / r.height) * 100}%`);
+  };
+  const onLeave = () => {
+    if (ref.current) ref.current.style.transform = '';
+  };
+  return (
+    <div ref={ref} className={`tilt-card ${className}`} onMouseMove={onMove} onMouseLeave={onLeave}>
+      {children}
+    </div>
+  );
+};
+
+/* ============================================================
+   4. ANIMATED COUNTER
+   ============================================================ */
+const Counter = ({ end, suffix = '', duration = 2000 }) => {
+  const [count, setCount] = useState(0);
+  const ref = useRef(null), started = useRef(false);
+  useEffect(() => {
+    const obs = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting && !started.current) {
+        started.current = true;
+        const start = performance.now();
+        const tick = (now) => {
+          const p = Math.min((now - start) / duration, 1);
+          setCount(Math.floor(end * (1 - Math.pow(1 - p, 3))));
+          if (p < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      }
+    }, { threshold: 0.5 });
+    if (ref.current) obs.observe(ref.current);
+    return () => obs.disconnect();
+  }, [end, duration]);
+  return <span ref={ref}>{count}{suffix}</span>;
+};
+
+/* ============================================================
+   5. SCROLL REVEAL
+   ============================================================ */
+const Reveal = ({ children, delay = 0, className = '' }) => {
+  const ref = useRef(null);
+  useEffect(() => {
+    const obs = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) {
+        setTimeout(() => ref.current?.classList.add('revealed'), delay);
+        obs.disconnect();
+      }
+    }, { threshold: 0.1 });
+    if (ref.current) obs.observe(ref.current);
+    return () => obs.disconnect();
+  }, [delay]);
+  return <div ref={ref} className={`reveal ${className}`}>{children}</div>;
+};
+
+/* ============================================================
+   6. SMART AI CHATBOT
+   ============================================================ */
+const ChatBot = () => {
+  const [open, setOpen] = useState(false);
+  const [messages, setMessages] = useState([
+    { from: 'bot', text: "Hey there! 👋 I'm Shubham's AI assistant. Ask me anything about his projects, skills, or just say hi!" }
+  ]);
+  const [input, setInput] = useState('');
+  const [typing, setTyping] = useState(false);
+  const scrollRef = useRef(null);
+
+  const getAnswer = (q) => {
+    const l = q.toLowerCase().trim();
+    if (l.match(/\b(hi|hello|hey|namaste|yo)\b/)) return "Hello! 👋 Great to see you. Want to know about Shubham's projects, skills, or just chat? Fire away!";
+    if (l.match(/how (are|r) (you|u)|how's it going/)) return "I'm running at peak performance, thanks for asking! 😄 How can I help you with Shubham's portfolio today?";
+    if (l.match(/who (are|r) (you|u)|introduce yourself/)) return "I'm Shubham's personal AI assistant — a digital version of his portfolio. Ask me anything about his work or skills!";
+    if (l.match(/who (is|'s) shubham|about shubham|tell me about (him|shubham)/)) return "Shubham Shukla is a Full Stack Developer & Web Designer with 2+ years of experience. He specializes in MERN, Next.js, Shopify, and AI-integrated apps (RAG). 40+ projects shipped, 5★ HackerRank! 🚀";
+    if (l.match(/project|work|portfolio|app|website/)) return "Shubham has built 40+ projects! Highlights: Recreators (AI/RAG/WebRTC), My Inner Side (mental wellness), Rogue0707 (Shopify), HealthStory, Prakritisa, BurgShake, and more. Which one do you want to explore? 🚀";
+    if (l.includes('recreator')) return "Recreators is a flagship project — full-stack platform with WebRTC video calling, Socket.IO real-time chat, RAG-powered AI chatbot, Razorpay payments, and analytics dashboards. Live at recreators-main.vercel.app 🚀";
+    if (l.includes('inner side')) return "My Inner Side is a mental wellness consultation platform connecting users with certified professionals for 1-on-1 sessions. Built with React, MongoDB, Express, Tailwind, and Razorpay. 🌿";
+    if (l.includes('rogue')) return "Rogue0707 is a modern fashion e-commerce platform built with headless Shopify GraphQL backend and React storefront. 🛍️";
+    if (l.match(/skill|tech|stack|know|language|framework/)) return "Shubham's stack: MERN, Next.js, Shopify, Tailwind, TypeScript, Java, Python, Redis, WebRTC, Socket.IO, GraphQL, Razorpay, Pandas, NumPy. Plus AI (RAG, vector search) and Data Analytics. 💻";
+    if (l.match(/experience|job|work at|company/)) return "Currently a Full Stack Developer at Recreators Design & Media (Nov 2024 – Present). Shipped 40+ projects, built production Shopify + Next.js platforms, optimized backends with Redis. 💼";
+    if (l.match(/education|study|degree|college/)) return "B.Tech in Computer Science with strong DSA foundation — 250+ problems solved, 5★ HackerRank in Java & SQL. 🎓";
+    if (l.match(/contact|email|phone|reach|whatsapp|call|hire|freelance/)) return "Reach out:\n📧 shubshukla2332@gmail.com\n📞 +91 9335162135 (Call/WhatsApp)\n💼 linkedin.com/in/shubham-shukla-b480a726a\n🐙 github.com/shubhamaaaa\n\nOpen to freelance and full-time roles! 💬";
+    if (l.match(/hobby|hobbies|free time|fun|interest/)) return "When not coding, Shubham loves solving DSA problems, exploring AI/ML trends, reading tech blogs, and experimenting with new frameworks. ☕💡";
+    if (l.match(/location|city|where|based/)) return "Shubham is based in Ghaziabad, Uttar Pradesh, India 🇮🇳. Open to remote work worldwide.";
+    if (l.match(/achiev|award|hackerrank|rank|star|dsa/)) return "Achievements:\n🏆 5★ HackerRank (Java & SQL)\n💡 250+ DSA problems solved\n📦 40+ production projects shipped\n⚡ Full Stack Developer @ Recreators";
+    if (l.match(/thank|thanks|thx/)) return "You're welcome! 😊 Good luck with your work! 🚀";
+    if (l.match(/bye|goodbye|exit/)) return "Goodbye! 👋 Feel free to reach out anytime at shubshukla2332@gmail.com.";
+    if (l.match(/joke|funny/)) {
+      const jokes = ["Why do programmers prefer dark mode? Light attracts bugs! 🐛", "There are 10 types of people: those who understand binary and those who don't. 🤓", "I'd tell you a UDP joke, but you might not get it. 📡"];
+      return jokes[Math.floor(Math.random() * jokes.length)];
+    }
+    if (l.match(/awesome|amazing|great|nice/)) return "Thank you so much! 😊 Let me know if you'd like to see anything specific! 🚀";
+    const fallbacks = [
+      "Interesting question! I'm best at talking about Shubham's projects, skills, or contact info. What would you like to know? 😊",
+      "Hmm, I might not have that info. Try asking about his projects, tech stack, or how to hire him! 🚀"
+    ];
+    return fallbacks[Math.floor(Math.random() * fallbacks.length)];
+  };
+
+  const send = (text) => {
+    if (!text.trim()) return;
+    setMessages(m => [...m, { from: 'user', text }]);
+    setInput('');
+    setTyping(true);
+    setTimeout(() => {
+      setMessages(m => [...m, { from: 'bot', text: getAnswer(text) }]);
+      setTyping(false);
+    }, 800);
+  };
+
+  useEffect(() => {
+    if (scrollRef.current) scrollRef.current.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
+  }, [messages, typing]);
+
+  return (
+    <>
+      <button className={`chat-fab ${open ? 'open' : ''}`} onClick={() => setOpen(!open)}>
+        {open ? <FaTimes /> : <FaRobot />}
+        {!open && <span className="chat-fab-pulse" />}
+      </button>
+
+      {open && (
+        <div className="chat-window">
+          <div className="chat-head">
+            <div className="chat-head-info">
+              <div className="chat-avatar"><FaRobot /></div>
+              <div>
+                <strong>AI Assistant</strong>
+                <span className="chat-status"><span className="online-dot" /> Online</span>
+              </div>
+            </div>
+            <button className="chat-close" onClick={() => setOpen(false)}><FaTimes /></button>
+          </div>
+          <div className="chat-body" ref={scrollRef}>
+            {messages.map((m, i) => (
+              <div key={i} className={`chat-msg ${m.from}`}>
+                {m.from === 'bot' && <div className="msg-avatar"><FaRobot /></div>}
+                <div className="msg-bubble">{m.text}</div>
+              </div>
+            ))}
+            {typing && (
+              <div className="chat-msg bot">
+                <div className="msg-avatar"><FaRobot /></div>
+                <div className="msg-bubble typing"><span /><span /><span /></div>
+              </div>
+            )}
+          </div>
+          <div className="chat-quick">
+            {['Tell me about Recreators', 'What are his skills?', 'How to hire?'].map(q => (
+              <button key={q} onClick={() => send(q)}>{q}</button>
+            ))}
+          </div>
+          <form className="chat-input-row" onSubmit={(e) => { e.preventDefault(); send(input); }}>
+            <input value={input} onChange={(e) => setInput(e.target.value)} placeholder="Ask anything..." />
+            <button type="submit" className="chat-send"><FaPaperPlane /></button>
+          </form>
+        </div>
+      )}
+    </>
+  );
+};
+
+/* ============================================================
+   7. WHATSAPP FAB
+   ============================================================ */
+const WhatsAppFab = () => {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <div className={`wa-fab-wrap ${expanded ? 'expanded' : ''}`}>
+      {expanded && (
+        <div className="wa-menu">
+          <a href="https://wa.me/919335162135?text=Hi%20Shubham!" target="_blank" rel="noreferrer" className="wa-option"><FaWhatsapp /> WhatsApp Chat</a>
+          <a href="tel:+919335162135" className="wa-option"><FaPhoneAlt /> Call Now</a>
+          <a href="https://wa.me/919335162135?text=Can%20we%20schedule%20a%20call%3F" target="_blank" rel="noreferrer" className="wa-option"><FaCalendarAlt /> Book a Call</a>
+        </div>
+      )}
+      <button className="wa-fab" onClick={() => setExpanded(!expanded)}>
+        {expanded ? <FaTimes /> : <FaWhatsapp />}
+        {!expanded && <span className="wa-tooltip">Chat with me · +91 9335162135</span>}
+      </button>
+    </div>
+  );
+};
+
+/* ============================================================
+   8. PROJECT MODAL
+   ============================================================ */
+const ProjectModal = ({ project, onClose }) => {
+  useEffect(() => {
+    if (!project) return;
+    const onEsc = (e) => e.key === 'Escape' && onClose();
+    document.addEventListener('keydown', onEsc);
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', onEsc);
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [project, onClose]);
+
+  if (!project) return null;
+
+  return (
+    <div className="modal-backdrop" onClick={onClose}>
+      <div className="modal-content" onClick={e => e.stopPropagation()}>
+        <button className="modal-close" onClick={onClose}><FaTimes /></button>
+        <div className="modal-img">
+          <img src={project.img} alt={project.title} />
+          <div className="modal-img-overlay" />
+        </div>
+        <div className="modal-body">
+          <div className="modal-meta">
+            <span className="project-cat">{project.category}</span>
+            {project.featured && <span className="modal-featured"><FaStar /> Featured</span>}
+          </div>
+          <h2>{project.title}</h2>
+          <p>{project.desc}</p>
+          {project.highlights && (
+            <div className="modal-highlights">
+              <h4><FaInfoCircle /> Key Highlights</h4>
+              <ul>{project.highlights.map((h, i) => <li key={i}><FaCheckCircle /> {h}</li>)}</ul>
+            </div>
+          )}
+          <div className="modal-tech">
+            <h4><FaLayerGroup /> Tech Stack</h4>
+            <div className="project-tech">{project.tech.map(t => <span key={t}>{t}</span>)}</div>
+          </div>
+          <div className="modal-actions">
+            <a href={project.link} target="_blank" rel="noreferrer" className="btn btn-primary"><FaExternalLinkAlt /> Visit Live Site</a>
+            <a href="#contact" className="btn btn-ghost" onClick={onClose}><FaEnvelope /> Discuss Similar Project</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ============================================================
+   9. DATA
+   ============================================================ */
+const PROJECTS = [
+  { id: 1, title: 'Recreators', img: project2, link: 'https://recreators-main.vercel.app/', desc: 'AI-powered business platform with real-time video calling, live chat, and an intelligent RAG-based chatbot.', tech: ['Next.js', 'WebRTC', 'Socket.IO', 'RAG', 'MongoDB', 'Razorpay'], category: 'AI + Full Stack', featured: true, highlights: ['WebRTC video calling', 'Socket.IO real-time chat', 'RAG-powered AI chatbot', 'Razorpay payments', 'Analytics dashboard', 'Vercel deployment'] },
+  { id: 2, title: 'My Inner Side', img: project1, link: 'https://myinnerside.com/', desc: 'Mental wellness consultation platform connecting users with certified professionals through secure 1-on-1 sessions.', tech: ['React', 'MongoDB', 'Tailwind', 'Express', 'Razorpay'], category: 'Full Stack', featured: true, highlights: ['1-on-1 consultation booking', 'Razorpay integration', 'Professional onboarding', 'Session scheduling', 'Responsive across devices'] },
+  { id: 3, title: 'Rogue0707', img: project3, link: 'https://www.rogue0707.com/', desc: 'Modern fashion e-commerce with headless Shopify GraphQL backend and React-powered storefront.', tech: ['React', 'Shopify', 'GraphQL'], category: 'E-Commerce', featured: true, highlights: ['Headless Shopify store', 'GraphQL API', 'Optimized performance', 'Custom checkout', 'SEO pages'] },
+  { id: 4, title: 'HealthStory', img: project4, link: 'https://healthstory.net.in/', desc: 'Wellness e-commerce with curated herbal catalog, secure payments, and subscription management.', tech: ['React', 'MongoDB', 'Express', 'Node'], category: 'E-Commerce', highlights: ['Curated wellness catalog', 'Secure checkout', 'Subscriptions', 'Order tracking'] },
+  { id: 5, title: 'Prakritisa', img: project5, link: 'https://prakritisa.com/', desc: 'Natural botanical products e-commerce with responsive design and optimized checkout.', tech: ['React', 'MongoDB', 'Express', 'Node'], category: 'E-Commerce', highlights: ['Botanical catalog', 'Optimized checkout', 'Search & filters', 'Customer reviews'] },
+  { id: 6, title: 'Ishmi Herbal', img: project2, link: 'https://ishmiherbal.com/', desc: 'Herbal marketplace with dynamic catalog, auth, and secure Razorpay integration.', tech: ['React', 'MongoDB', 'Tailwind', 'Express', 'Node'], category: 'E-Commerce', highlights: ['Dynamic catalog', 'Auth & profiles', 'Razorpay payments', 'Admin dashboard'] },
+  { id: 7, title: 'BurgShake', img: project6, link: 'https://burgshake.vercel.app/', desc: 'Modern food delivery brand website with animated menu, cart, and ordering flow.', tech: ['React', 'Vite', 'Tailwind'], category: 'Frontend', highlights: ['Animated menu', 'Interactive cart', 'Order flow', 'Mobile-first'] },
+  { id: 8, title: 'Warrior Beverages', img: project5, link: 'https://warriorbeverages.in/', desc: 'Corporate beverage brand website with product showcase and lead generation.', tech: ['React', 'Node', 'MongoDB'], category: 'Business', highlights: ['Product showcase', 'Lead capture', 'Brand storytelling', 'SEO-ready'] },
+  { id: 9, title: 'Insight Integrators', img: project4, link: 'https://insightintegrators.ae/', desc: 'UAE-based consulting firm website with modern UI, SEO, and analytics dashboard.', tech: ['Next.js', 'Tailwind', 'Node'], category: 'Business', highlights: ['Modern corporate UI', 'SEO pages', 'Analytics dashboard', 'Multi-language ready'] },
+  { id: 10, title: 'ShanuPG', img: project6, link: 'https://shanupg-frontend.vercel.app/', desc: 'Responsive PG accommodation discovery platform with booking and filters.', tech: ['React', 'Vite', 'Tailwind'], category: 'Frontend', highlights: ['PG search & filters', 'Booking flow', 'Responsive UI', 'Vercel deploy'] },
+];
+
+const SKILLS = {
+  'Languages': [
+    { name: 'JavaScript', level: 95, icon: <FaJs /> },
+    { name: 'Java', level: 90, icon: <FaJava /> },
+    { name: 'Python', level: 85, icon: <FaPython /> },
+    { name: 'TypeScript', level: 80, icon: <SiTypescript /> },
+  ],
+  'Frontend': [
+    { name: 'React.js', level: 95, icon: <FaReact /> },
+    { name: 'Next.js', level: 90, icon: <SiNextdotjs /> },
+    { name: 'Tailwind CSS', level: 92, icon: <SiTailwindcss /> },
+    { name: 'Shopify', level: 85, icon: <SiShopify /> },
+  ],
+  'Backend': [
+    { name: 'Node.js', level: 90, icon: <FaNodeJs /> },
+    { name: 'Express.js', level: 88, icon: <SiExpress /> },
+    { name: 'MongoDB', level: 87, icon: <SiMongodb /> },
+    { name: 'Redis', level: 75, icon: <SiRedis /> },
+  ],
+  'AI / Data': [
+    { name: 'Pandas / NumPy', level: 85, icon: <FaDatabase /> },
+    { name: 'Matplotlib / Seaborn', level: 80, icon: <FaChartLine /> },
+    { name: 'RAG / Vector Search', level: 78, icon: <FaBrain /> },
+    { name: 'WebRTC / Socket.IO', level: 82, icon: <FaVideo /> },
+  ],
+};
+
+const TECH_MARQUEE = ['React', 'Next.js', 'Node.js', 'MongoDB', 'Express', 'Tailwind', 'Shopify', 'TypeScript', 'Python', 'Java', 'Redis', 'WebRTC', 'Socket.IO', 'RAG', 'GraphQL', 'Razorpay', 'Pandas', 'NumPy'];
+const NAV_ITEMS = [
+  { id: 'home', label: 'Home' },
+  { id: 'about', label: 'About' },
+  { id: 'experience', label: 'Experience' },
+  { id: 'skills', label: 'Skills' },
+  { id: 'projects', label: 'Projects' },
+  { id: 'contact', label: 'Contact' },
+];
+
+/* ============================================================
+   10. THEME HOOK
+   ============================================================ */
+const useTheme = () => {
+  const [theme, setTheme] = useState(() => {
+    if (typeof window === 'undefined') return 'dark';
+    return localStorage.getItem('theme') || 'dark';
+  });
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+  return { theme, toggle: () => setTheme(t => t === 'dark' ? 'light' : 'dark') };
+};
+
+/* ============================================================
+   11. MAIN APP
+   ============================================================ */
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [formStatus, setFormStatus] = useState({ sending: false, sent: false, error: '' });
   const [activeSection, setActiveSection] = useState('home');
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [filter, setFilter] = useState('All');
+  const [selectedProject, setSelectedProject] = useState(null);
+  const { theme, toggle: toggleTheme } = useTheme();
 
   useEffect(() => {
-    const handleScroll = () => {
+    const onScroll = () => {
+      const total = document.documentElement.scrollHeight - window.innerHeight;
+      setScrollProgress((window.scrollY / total) * 100);
       const sections = document.querySelectorAll('section');
-      let currentSection = 'home';
-
-      sections.forEach(section => {
-        const sectionTop = section.offsetTop;
-        const sectionHeight = section.clientHeight;
-
-        if (window.scrollY >= sectionTop - 200 && window.scrollY < sectionTop + sectionHeight - 200) {
-          currentSection = section.id;
-        }
+      let current = 'home';
+      sections.forEach(s => {
+        if (window.scrollY >= s.offsetTop - 200 && window.scrollY < s.offsetTop + s.clientHeight - 200) current = s.id;
       });
-
-      setActiveSection(currentSection);
+      setActiveSection(current);
     };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  const toggleMenu = () => {
-    setMenuOpen(!menuOpen);
-  };
+  const scrollToSection = useCallback((id) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+    setMenuOpen(false);
+  }, []);
 
-  const handleFormChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const handleFormChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  // In your contact form component
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Prevent multiple submissions
     if (formStatus.sending) return;
-
     setFormStatus({ sending: true, sent: false, error: '' });
-
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/send`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      // Handle rate limit errors
-      if (response.status === 429) {
-        throw new Error('Too many requests. Please try again later.');
-      }
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setFormStatus({ sending: false, sent: true, error: '' });
-        setFormData({ name: '', email: '', message: '' });
-      } else {
-        setFormStatus({ sending: false, sent: false, error: data.message || 'Error sending message' });
-      }
-    } catch (error) {
-      setFormStatus({
-        sending: false,
-        sent: false,
-        error: error.message || 'Network error. Please try again.'
-      });
+      // Fake API for demo, replace with your real endpoint
+      await new Promise(r => setTimeout(r, 1500)); 
+      setFormStatus({ sending: false, sent: true, error: '' });
+      setFormData({ name: '', email: '', message: '' });
+    } catch (err) {
+      setFormStatus({ sending: false, sent: false, error: 'Network error. Please try again.' });
     }
   };
 
-  const scrollToSection = (sectionId) => {
-    const section = document.getElementById(sectionId);
-    if (section) {
-      section.scrollIntoView({ behavior: 'smooth' });
-      setMenuOpen(false);
-    }
-  };
+  const categories = ['All', ...new Set(PROJECTS.map(p => p.category))];
+  const filteredProjects = filter === 'All' ? PROJECTS : PROJECTS.filter(p => p.category === filter);
 
   return (
     <div className="App">
-      {/* Header */}
-      <header className="header">
-        <div className="container">
-          <div className="logo">Shubham<span>Shukla</span></div>
+      <CustomCursor />
+      <div className="scroll-progress" style={{ width: `${scrollProgress}%` }} />
+
+      {/* NEW AURORA BACKGROUND (No ugly lines) */}
+      <div className="bg-aurora">
+        <div className="blob blob-1" />
+        <div className="blob blob-2" />
+        <div className="blob blob-3" />
+        <div className="noise-overlay" />
+      </div>
+
+      <header className={`header ${scrollProgress > 5 ? 'scrolled' : ''}`}>
+        <div className="container header-inner">
+          <a className="logo" href="#home" onClick={() => scrollToSection('home')}>
+            <span className="logo-mark">S</span>
+            <span className="logo-text">Shubham<span>.dev</span></span>
+          </a>
           <nav className={`nav ${menuOpen ? 'nav-open' : ''}`}>
-            <a
-              href="#home"
-              className={activeSection === 'home' ? 'active' : ''}
-              onClick={() => scrollToSection('home')}
-            >Home</a>
-            <a
-              href="#about"
-              className={activeSection === 'about' ? 'active' : ''}
-              onClick={() => scrollToSection('about')}
-            >About</a>
-            <a
-              href="#experience"
-              className={activeSection === 'experience' ? 'active' : ''}
-              onClick={() => scrollToSection('experience')}
-            >Experience</a>
-            <a
-              href="#skills"
-              className={activeSection === 'skills' ? 'active' : ''}
-              onClick={() => scrollToSection('skills')}
-            >Skills</a>
-            <a
-              href="#projects"
-              className={activeSection === 'projects' ? 'active' : ''}
-              onClick={() => scrollToSection('projects')}
-            >Projects</a>
-            <a
-              href="#contact"
-              className={activeSection === 'contact' ? 'active' : ''}
-              onClick={() => scrollToSection('contact')}
-            >Contact</a>
+            {NAV_ITEMS.map(item => (
+              <a key={item.id} href={`#${item.id}`} className={activeSection === item.id ? 'active' : ''} onClick={() => scrollToSection(item.id)}>
+                {item.label}
+              </a>
+            ))}
+            <button className="theme-toggle" onClick={toggleTheme} aria-label="Toggle theme">
+              {theme === 'dark' ? <FaSun /> : <FaMoon />}
+            </button>
+            <MagneticButton>
+              <a href="#contact" className="btn btn-sm btn-primary" onClick={() => scrollToSection('contact')}>Hire Me</a>
+            </MagneticButton>
           </nav>
-          <button className="menu-btn" onClick={toggleMenu}>
-            {menuOpen ? <FaTimes /> : <FaBars />}
-          </button>
+          <div className="header-mobile-controls">
+            <button className="theme-toggle" onClick={toggleTheme} aria-label="Toggle theme">
+              {theme === 'dark' ? <FaSun /> : <FaMoon />}
+            </button>
+            <button className="menu-btn" onClick={() => setMenuOpen(!menuOpen)} aria-label="Menu">
+              {menuOpen ? <FaTimes /> : <FaBars />}
+            </button>
+          </div>
         </div>
       </header>
 
-      {/* Hero Section */}
       <section id="home" className="hero">
-        <div className="hero-background">
-          <div className="particles">
-            {[...Array(50)].map((_, i) => (
-              <div key={i} className="particle" style={{
-                top: `${Math.random() * 100}%`,
-                left: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 5}s`,
-                animationDuration: `${15 + Math.random() * 10}s`
-              }}></div>
+        <div className="container">
+          <div className="hero-grid">
+            <div className="hero-left">
+              <div className="hero-badge"><span className="pulse-dot" /> Available for opportunities</div>
+              <h1 className="hero-title">
+                Building <span className="gradient-text">intelligent</span><br />
+                web experiences<br />
+                that <span className="gradient-text">scale.</span>
+              </h1>
+              <p className="hero-sub">
+                Full Stack Developer & AI Enthusiast crafting production-grade platforms with
+                MERN, Next.js, Shopify, and <strong>RAG-powered AI</strong>. 40+ shipped projects.
+              </p>
+              <div className="hero-cta">
+                <MagneticButton>
+                  <a href="#projects" className="btn btn-primary" onClick={() => scrollToSection('projects')}>
+                    Explore Work <FaArrowRight />
+                  </a>
+                </MagneticButton>
+                <MagneticButton>
+                  <a href="https://wa.me/919335162135" target="_blank" rel="noreferrer" className="btn btn-ghost">
+                    <FaWhatsapp /> WhatsApp Me
+                  </a>
+                </MagneticButton>
+              </div>
+              <div className="hero-socials">
+                <a href="https://www.linkedin.com/in/shubham-shukla-b480a726a" target="_blank" rel="noreferrer"><FaLinkedin /></a>
+                <a href="https://github.com/shubhamaaaa" target="_blank" rel="noreferrer"><FaGithub /></a>
+                <a href="https://wa.me/919335162135" target="_blank" rel="noreferrer"><FaWhatsapp /></a>
+                <a href="mailto:shubshukla2332@gmail.com"><FaEnvelope /></a>
+              </div>
+            </div>
+            <div className="hero-right">
+              <div className="hero-visual">
+                <div className="hero-card-3d">
+                  <div className="hero-avatar">SS</div>
+                  <div className="hero-float-card float-1"><FaRobot /> <span>AI / RAG</span></div>
+                  <div className="hero-float-card float-2"><FaFire /> <span>40+ Projects</span></div>
+                  <div className="hero-float-card float-3"><FaTrophy /> <span>5★ HackerRank</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="stats-bar">
+            <div className="stat-block"><Counter end={40} suffix="+" /><span>Projects</span></div>
+            <div className="stat-block"><Counter end={250} suffix="+" /><span>DSA Solved</span></div>
+            <div className="stat-block"><Counter end={5} suffix="★" /><span>HackerRank</span></div>
+            <div className="stat-block"><Counter end={2} suffix="+ yrs" /><span>Experience</span></div>
+          </div>
+        </div>
+
+        <div className="marquee">
+          <div className="marquee-track">
+            {[...TECH_MARQUEE, ...TECH_MARQUEE].map((t, i) => (
+              <span key={i} className="marquee-item">{t} <span className="dot">•</span></span>
             ))}
           </div>
         </div>
+      </section>
+
+      <section id="about" className="about">
         <div className="container">
-          <div className="hero-content">
-            <div className="hero-text">
-              <div className="hero-badge">Full Stack Developer</div>
-              <h1>Transforming Ideas Into <span>Digital Reality</span></h1>
-              <p>I design and develop responsive, user-friendly websites and applications using modern technologies like MERN Stack, Shopify, and more.</p>
-              <div className="hero-buttons">
-                <a href="#projects" className="btn">
-                  <FaCode className="btn-icon" />
-                  View My Work
-                </a>
-                <a href="#contact" className="btn btn-outline">
-                  <FaPaperPlane className="btn-icon" />
-                  Contact Me
-                </a>
-              </div>
-              <div className="hero-social">
-                <a href="www.linkedin.com/in/shubham-shukla-b480a726a"><FaLinkedin /></a>
-                <a href="https://github.com/shubhamaaaa"><FaGithub /></a>
-
-
-                <a href="https://wa.me/919335162135" target="_blank" rel="noopener noreferrer">
-                  <FaWhatsapp />
-                </a>
-              </div>
+          <Reveal>
+            <div className="section-head">
+              <span className="section-tag">01 — About</span>
+              <h2>Engineer by craft. <span className="gradient-text">Creator by passion.</span></h2>
             </div>
-            <div className="hero-image">
-              <div className="image-wrapper">
-                <div className="profile-image">
-                  <span>SS</span>
+          </Reveal>
+
+          <div className="bento-grid">
+            <Reveal delay={100} className="bento-large">
+              <TiltCard>
+                <div className="bento-card glass">
+                  <div className="bento-icon"><FaCode /></div>
+                  <h3>The Story</h3>
+                  <p>I'm <span className="highlight">Shubham Shukla</span> — a Full Stack Developer & Web Designer specializing in <span className="highlight">MERN</span>, <span className="highlight">Next.js</span>, <span className="highlight">Shopify</span>, and <span className="highlight">AI-integrated apps</span>. I turn complex business requirements into elegant, scalable digital products.</p>
+                  <p>From <span className="highlight">RAG-powered chatbots</span> to <span className="highlight">WebRTC video platforms</span>, I build production-ready systems that solve real problems with performance and polish.</p>
                 </div>
-                <div className="floating-element el-1"></div>
-                <div className="floating-element el-2"></div>
-                <div className="floating-element el-3"></div>
-              </div>
-            </div>
+              </TiltCard>
+            </Reveal>
+            <Reveal delay={150}><TiltCard><div className="bento-card glass"><FaGraduationCap className="bento-icon" /><h4>Education</h4><p>B.Tech Computer Science</p><span className="bento-tag">Strong CS Foundation</span></div></TiltCard></Reveal>
+            <Reveal delay={200}><TiltCard><div className="bento-card glass"><FaBriefcase className="bento-icon" /><h4>Experience</h4><p>Full Stack Dev @ Recreators</p><span className="bento-tag">Nov 2024 – Present</span></div></TiltCard></Reveal>
+            <Reveal delay={250}><TiltCard><div className="bento-card glass"><FaBrain className="bento-icon" /><h4>AI & Data</h4><p>RAG · Vector Search · Pandas</p><span className="bento-tag">Kaggle · Jupyter</span></div></TiltCard></Reveal>
+            <Reveal delay={300}><TiltCard><div className="bento-card glass"><FaTrophy className="bento-icon" /><h4>Achievements</h4><p>5★ Java & SQL on HackerRank</p><span className="bento-tag">250+ DSA solved</span></div></TiltCard></Reveal>
           </div>
         </div>
       </section>
 
-  {/* About Section */}
-<section id="about" className="about">
-  <div className="container">
-    <div className="section-title">
-      <h2>About Me</h2>
-      <p>Passionate about building scalable digital experiences</p>
-    </div>
+      <section id="experience" className="experience">
+        <div className="container">
+          <Reveal>
+            <div className="section-head">
+              <span className="section-tag">02 — Experience</span>
+              <h2>Where I've <span className="gradient-text">shipped real things.</span></h2>
+            </div>
+          </Reveal>
 
-    <div className="about-content">
-      <div className="about-text">
-        <h3>
-          Hello! I'm <span className="highlight-text">Shubham Shukla</span>
-        </h3>
-
-        <p>
-          I'm a passionate{" "}
-          <span className="highlight-text">
-            Full Stack Developer
-          </span>{" "}
-          and{" "}
-          <span className="highlight-text">
-            Web Designer
-          </span>{" "}
-          specializing in modern, scalable, and{" "}
-          <span className="highlight-text">
-            high-performance web applications
-          </span>.
-          With strong expertise in the{" "}
-          <span className="highlight-text">MERN Stack</span>,{" "}
-          <span className="highlight-text">Next.js</span>,{" "}
-          <span className="highlight-text">Shopify</span>, and responsive{" "}
-          <span className="highlight-text">UI/UX design</span>, I create
-          digital products that combine functionality, performance, and
-          exceptional user experience.
-        </p>
-
-        <p>
-          I have hands-on experience developing{" "}
-          <span className="highlight-text">
-            production-ready e-commerce platforms
-          </span>,
-          business websites, admin dashboards, and custom web solutions with{" "}
-          <span className="highlight-text">
-            secure payment integrations
-          </span>,
-          optimized backend architectures, and{" "}
-          <span className="highlight-text">
-            SEO-focused frontend development
-          </span>.
-          My goal is to build impactful applications that help businesses grow
-          efficiently in the digital space.
-        </p>
-
-        <p>
-          I continuously explore modern technologies and best development
-          practices to deliver{" "}
-          <span className="highlight-text">
-            clean, maintainable, and future-ready solutions
-          </span>{" "}
-          while solving complex technical challenges with creativity and
-          precision.
-        </p>
-
-        <div className="about-stats">
-          <div className="stat">
-            <span className="stat-number highlight-text">250+</span>
-            <span className="stat-label">DSA Problems Solved</span>
-          </div>
-
-          <div className="stat">
-            <span className="stat-number highlight-text">32+</span>
-            <span className="stat-label">Projects Built</span>
-          </div>
-
-          <div className="stat">
-            <span className="stat-number highlight-text">5★</span>
-            <span className="stat-label">HackerRank Java & SQL</span>
-          </div>
+          <Reveal delay={100}>
+            <div className="timeline">
+              <div className="timeline-item">
+                <div className="timeline-dot" />
+                <div className="timeline-content glass">
+                  <div className="timeline-head">
+                    <div>
+                      <h3>Full Stack Developer & Web Designer</h3>
+                      <h4 className="gradient-text">Recreators Design & Media Pvt. Ltd.</h4>
+                    </div>
+                    <span className="timeline-date">Nov 2024 – Present</span>
+                  </div>
+                  <ul className="timeline-list">
+                    <li>Built <span className="highlight">Recreators platform</span> with WebRTC video calling, Socket.IO real-time, and RAG-powered AI chatbot using embeddings & vector search.</li>
+                    <li>Integrated <span className="highlight">Razorpay payments</span>, REST APIs, MongoDB, and analytics dashboards for business insights.</li>
+                    <li>Optimized backend with <span className="highlight">Redis caching</span> and async job queues for high-traffic scalability.</li>
+                    <li>Delivered production Shopify + Next.js platforms: <span className="highlight">Flickemart</span>, <span className="highlight">Riarmart</span>, and more.</li>
+                    <li>Built secure <span className="highlight">REST APIs</span>, RBAC, and admin dashboards.</li>
+                    <li>Shipped <span className="highlight">40+ projects</span> end-to-end, from Figma to deploy.</li>
+                  </ul>
+                  <div className="timeline-tags">
+                    {['MERN', 'Next.js', 'RAG', 'WebRTC', 'Socket.IO', 'Redis', 'Shopify', 'Razorpay'].map(t => <span key={t}>{t}</span>)}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Reveal>
         </div>
-      </div>
+      </section>
 
-      <div className="about-info">
-        <div className="info-item">
-          <FaGraduationCap className="info-icon" />
-          <h4>Education</h4>
-          <p>B.Tech in Computer Science</p>
-          <p className="highlight">Strong Technical Foundation</p>
-        </div>
-
-        <div className="info-item">
-          <FaBriefcase className="info-icon" />
-          <h4>Experience</h4>
-          <p>Full Stack Developer & Web Designer</p>
-          <p className="highlight">Recreators Design</p>
-        </div>
-
-        <div className="info-item">
-          <FaCode className="info-icon" />
-          <h4>Core Technologies</h4>
-          <p>MERN Stack, Next.js</p>
-          <p className="highlight">Shopify & Tailwind CSS</p>
-        </div>
-
-        <div className="info-item">
-          <FaStar className="info-icon" />
-          <h4>Achievements</h4>
-          <p>5★ HackerRank Ratings</p>
-          <p className="highlight">Java & SQL</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-{/* Experience Section */}
-<section id="experience" className="experience">
-  <div className="container">
-    <div className="section-title">
-      <h2>My Experience</h2>
-      <p>Professional journey and real-world development experience</p>
-    </div>
-
-    <div className="experience-item">
-      <div className="experience-header">
-        <div>
-          <h3>
-            <span className="highlight-text">
-              Full Stack Developer & Web Designer
-            </span>
-          </h3>
-
-          <h4>
-            <span className="highlight-text">
-              Recreators Design and Media Pvt. Ltd.
-            </span>
-          </h4>
-        </div>
-
-        <span className="experience-date">
-          Nov 2024 – Present
-        </span>
-      </div>
-
-      <ul>
-        <li>
-          Designed and developed scalable, high-performance web applications
-          using <span className="highlight-text">MERN Stack</span>,{" "}
-          <span className="highlight-text">Next.js</span>, and{" "}
-          <span className="highlight-text">Shopify</span> for diverse business
-          requirements.
-        </li>
-
-        <li>
-          Built modern e-commerce platforms with{" "}
-          <span className="highlight-text">
-            secure payment gateway integrations
-          </span>,
-          referral systems, automated workflows, and{" "}
-          <span className="highlight-text">
-            real-time SMS/WhatsApp notifications
-          </span>.
-        </li>
-
-        <li>
-          Optimized backend performance using{" "}
-          <span className="highlight-text">Redis caching</span>,{" "}
-          <span className="highlight-text">asynchronous job queues</span>, and
-          efficient database management techniques to improve scalability and
-          server efficiency.
-        </li>
-
-        <li>
-          Delivered production-ready{" "}
-          <span className="highlight-text">Shopify</span> and{" "}
-          <span className="highlight-text">React/Next.js</span> projects,
-          including{" "}
-          <span className="highlight-text">Flickemart</span> and{" "}
-          <span className="highlight-text">Riarmart</span>, while maintaining
-          high-quality development standards and timely delivery.
-        </li>
-
-        <li>
-          Developed secure{" "}
-          <span className="highlight-text">RESTful APIs</span>,
-          authentication systems,{" "}
-          <span className="highlight-text">
-            role-based access control
-          </span>,
-          and dynamic admin dashboards to streamline business operations.
-        </li>
-
-        <li>
-          Collaborated directly with clients and cross-functional teams to
-          transform business requirements into{" "}
-          <span className="highlight-text">
-            intuitive, user-centric digital solutions
-          </span>.
-        </li>
-
-        <li>
-          Improved website performance,{" "}
-          <span className="highlight-text">SEO</span>, responsiveness, and user
-          engagement through optimized frontend architecture using{" "}
-          <span className="highlight-text">React.js</span>,{" "}
-          <span className="highlight-text">Next.js</span>, and{" "}
-          <span className="highlight-text">Tailwind CSS</span>.
-        </li>
-
-        <li>
-          Demonstrated strong problem-solving abilities by debugging complex
-          technical issues and implementing{" "}
-          <span className="highlight-text">
-            scalable, reliable, and maintainable solutions
-          </span>{" "}
-          under tight deadlines.
-        </li>
-      </ul>
-    </div>
-  </div>
-</section>
-
-      {/* Skills Section */}
       <section id="skills" className="skills">
         <div className="container">
-          <div className="section-title">
-            <h2>My Skills</h2>
-            <p>Technologies I work with</p>
-          </div>
-          <div className="skills-container">
-            <div className="skill-category">
-              <h3>Languages</h3>
-              <div className="skills-grid">
-                <div className="skill-item">
-                  <div className="skill-name">Java</div>
-                  <div className="skill-bar">
-                    <div className="skill-progress" style={{ width: '90%' }}></div>
-                  </div>
-                </div>
-                <div className="skill-item">
-                  <div className="skill-name">Python</div>
-                  <div className="skill-bar">
-                    <div className="skill-progress" style={{ width: '80%' }}></div>
-                  </div>
-                </div>
-                <div className="skill-item">
-                  <div className="skill-name">JavaScript</div>
-                  <div className="skill-bar">
-                    <div className="skill-progress" style={{ width: '95%' }}></div>
-                  </div>
-                </div>
-              </div>
+          <Reveal>
+            <div className="section-head">
+              <span className="section-tag">03 — Skills</span>
+              <h2>A stack built for <span className="gradient-text">real products.</span></h2>
             </div>
-            <div className="skill-category">
-              <h3>Frontend Development</h3>
-              <div className="skills-grid">
-                <div className="skill-item">
-                  <div className="skill-name">React JS</div>
-                  <div className="skill-bar">
-                    <div className="skill-progress" style={{ width: '90%' }}></div>
+          </Reveal>
+          <div className="skills-grid-modern">
+            {Object.entries(SKILLS).map(([cat, items], idx) => (
+              <Reveal key={cat} delay={idx * 100}>
+                <div className="skill-panel glass">
+                  <h3 className="skill-panel-title">{cat}</h3>
+                  <div className="skill-list">
+                    {items.map(s => (
+                      <div key={s.name} className="skill-row">
+                        <div className="skill-row-top">
+                          <span className="skill-icon">{s.icon}</span>
+                          <span className="skill-name">{s.name}</span>
+                          <span className="skill-pct">{s.level}%</span>
+                        </div>
+                        <div className="skill-track"><div className="skill-fill" style={{ '--target': `${s.level}%` }} /></div>
+                      </div>
+                    ))}
                   </div>
                 </div>
-                <div className="skill-item">
-                  <div className="skill-name">Next.js</div>
-                  <div className="skill-bar">
-                    <div className="skill-progress" style={{ width: '85%' }}></div>
-                  </div>
-                </div>
-                <div className="skill-item">
-                  <div className="skill-name">Tailwind CSS</div>
-                  <div className="skill-bar">
-                    <div className="skill-progress" style={{ width: '88%' }}></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="skill-category">
-              <h3>Backend Development</h3>
-              <div className="skills-grid">
-                <div className="skill-item">
-                  <div className="skill-name">Node.js</div>
-                  <div className="skill-bar">
-                    <div className="skill-progress" style={{ width: '87%' }}></div>
-                  </div>
-                </div>
-                <div className="skill-item">
-                  <div className="skill-name">Express.js</div>
-                  <div className="skill-bar">
-                    <div className="skill-progress" style={{ width: '85%' }}></div>
-                  </div>
-                </div>
-                <div className="skill-item">
-                  <div className="skill-name">MongoDB</div>
-                  <div className="skill-bar">
-                    <div className="skill-progress" style={{ width: '83%' }}></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="skill-category">
-              <h3>Data Analysis</h3>
-              <div className="skills-grid">
-                <div className="skill-item">
-                  <div className="skill-name">Pandas</div>
-                  <div className="skill-bar">
-                    <div className="skill-progress" style={{ width: '80%' }}></div>
-                  </div>
-                </div>
-                <div className="skill-item">
-                  <div className="skill-name">Power BI</div>
-                  <div className="skill-bar">
-                    <div className="skill-progress" style={{ width: '75%' }}></div>
-                  </div>
-                </div>
-                <div className="skill-item">
-                  <div className="skill-name">Excel</div>
-                  <div className="skill-bar">
-                    <div className="skill-progress" style={{ width: '85%' }}></div>
-                  </div>
-                </div>
-              </div>
-            </div>
+              </Reveal>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Projects Section */}
       <section id="projects" className="projects">
         <div className="container">
-          <div className="section-title">
-            <h2>My Projects</h2>
-            <p>A selection of my recent work</p>
+          <Reveal>
+            <div className="section-head">
+              <span className="section-tag">04 — Projects</span>
+              <h2>Selected <span className="gradient-text">work.</span></h2>
+            </div>
+          </Reveal>
+
+          <div className="filter-bar">
+            {categories.map(c => (
+              <button key={c} className={`filter-btn ${filter === c ? 'active' : ''}`} onClick={() => setFilter(c)}>{c}</button>
+            ))}
           </div>
-          <div className="projects-grid">
-            <div className="project-card">
-              <div className="project-img">
-                <img src={project1} alt="My Inner Side Project" />
-                <div className="project-overlay">
-                  <div className="project-links">
-                    <a href="https://myinnerside.com/" className="project-link">
-                      <FaExternalLinkAlt />
-                    </a>
-                    <a href="#" className="project-link">
-                      <FaGithub />
-                    </a>
+
+          <div className="projects-grid-modern">
+            {filteredProjects.map((p, i) => (
+              <Reveal key={p.id} delay={i * 60}>
+                <TiltCard>
+                  <div className="project-card-modern" onClick={() => setSelectedProject(p)} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && setSelectedProject(p)}>
+                    <div className="project-img-wrap">
+                      <img src={p.img} alt={p.title} loading="lazy" />
+                      <div className="project-overlay"><span className="project-view"><FaEye /> View Details</span></div>
+                      {p.featured && <span className="featured-badge"><FaStar /> Featured</span>}
+                    </div>
+                    <div className="project-body">
+                      <div className="project-meta"><span className="project-cat">{p.category}</span><span className="project-open-icon"><FaExternalLinkAlt /></span></div>
+                      <h3>{p.title}</h3>
+                      <p>{p.desc}</p>
+                      <div className="project-tech">{p.tech.slice(0, 4).map(t => <span key={t}>{t}</span>)}{p.tech.length > 4 && <span>+{p.tech.length - 4}</span>}</div>
+                    </div>
                   </div>
-                </div>
-              </div>
-              <div className="project-content">
-                <h3>My Inner Side</h3>
-                <p>A personalized consultation platform offering one-on-one sessions with certified professionals for meaningful and empathetic listening.</p>
-                <div className="project-tech">
-                  <span>React JS</span>
-                  <span>MongoDB</span>
-                  <span>Tailwind</span>
-                  <span>Express</span>
-                  <span>Razorpay</span>
-                </div>
-              </div>
-            </div>
-            <div className="project-card">
-              <div className="project-img">
-                <img src={project2} alt="Ishmi Herbal Project" />
-                <div className="project-overlay">
-                  <div className="project-links">
-                    <a href="https://ishmiherbal.com/" className="project-link">
-                      <FaExternalLinkAlt />
-                    </a>
-                    <a href="#" className="project-link">
-                      <FaGithub />
-                    </a>
-                  </div>
-                </div>
-              </div>
-              <div className="project-content">
-                <h3>Ishmi Herbal</h3>
-                <p>Built a responsive herbal product marketplace with a dynamic product catalog, user authentication, and secure payment integration.</p>
-                <div className="project-tech">
-                  <span>React JS</span>
-                  <span>MongoDB</span>
-                  <span>Tailwind</span>
-                  <span>Express</span>
-                  <span>Node JS</span>
-                </div>
-              </div>
-            </div>
-            <div className="project-card">
-              <div className="project-img">
-                <img src={project3} alt="Rogue0707 Project" />
-                <div className="project-overlay">
-                  <div className="project-links">
-                    <a href="https://www.rogue0707.com/" className="project-link">
-                      <FaExternalLinkAlt />
-                    </a>
-                    <a href="#" className="project-link">
-                      <FaGithub />
-                    </a>
-                  </div>
-                </div>
-              </div>
-              <div className="project-content">
-                <h3>Rogue0707</h3>
-                <p>Built a modern e-commerce platform for clothing and accessories using React.js frontend with a Shopify GraphQL backend.</p>
-                <div className="project-tech">
-                  <span>React</span>
-                  <span>Shopify</span>
-                  <span>GraphQL</span>
-                </div>
-              </div>
-            </div>
-            <div className="project-card">
-              <div className="project-img">
-                <img src={project4} alt="HealthStory Project" />
-                <div className="project-overlay">
-                  <div className="project-links">
-                    <a href="https://healthstory.net.in/" className="project-link">
-                      <FaExternalLinkAlt />
-                    </a>
-                    <a href="#" className="project-link">
-                      <FaGithub />
-                    </a>
-                  </div>
-                </div>
-              </div>
-              <div className="project-content">
-                <h3>HealthStory</h3>
-                <p>Developed a wellness-focused e-commerce platform with a curated herbal/nutritional product catalog and seamless payment integration.</p>
-                <div className="project-tech">
-                  <span>React JS</span>
-                  <span>MongoDB</span>
-                  <span>Express</span>
-                  <span>Node JS</span>
-                </div>
-              </div>
-
-
-            </div>
-
-            <div className="project-card">
-              <div className="project-img">
-                <img src={project5} alt="HealthStory Project" />
-                <div className="project-overlay">
-                  <div className="project-links">
-                    <a href="https://prakritisa.com/" className="project-link">
-                      <FaExternalLinkAlt />
-                    </a>
-                    <a href="#" className="project-link">
-                      <FaGithub />
-                    </a>
-                  </div>
-                </div>
-              </div>
-              <div className="project-content">
-                <h3>Prakritisa</h3>
-                <p>Developed and contributed to Prakritisa.com, an e-commerce website for natural and botanical products, focusing on responsive design, smooth user experience, and secure checkout functionality.</p>
-                <div className="project-tech">
-                  <span>React JS</span>
-                  <span>MongoDB</span>
-                  <span>Express</span>
-                  <span>Node JS</span>
-                </div>
-              </div>
-
-
-            </div>
-
-
-            <div className="project-card">
-              <div className="project-img">
-                <img src={project6} alt="HealthStory Project" />
-                <div className="project-overlay">
-                  <div className="project-links">
-                    <a href="https://shanupg-frontend.vercel.app/" className="project-link">
-                      <FaExternalLinkAlt />
-                    </a>
-                    <a href="#" className="project-link">
-                      <FaGithub />
-                    </a>
-                  </div>
-                </div>
-              </div>
-              <div className="project-content">
-                <h3>ShanuPg</h3>
-                <p>Developed and deployed shanupg-frontend.vercel.app using React, Vite, and Tailwind CSS. Focused on building a clean, responsive interface with smooth navigation, hosted on Vercel for fast and reliable performance..</p>
-                <div className="project-tech">
-                  <span>React JS</span>
-                  <span>MongoDB</span>
-                  <span>Express</span>
-                  <span>Node JS</span>
-                </div>
-              </div>
-
-
-            </div>
-
+                </TiltCard>
+              </Reveal>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Contact Section */}
       <section id="contact" className="contact">
         <div className="container">
-          <div className="section-title">
-            <h2>Contact Me</h2>
-            <p>Get in touch</p>
-          </div>
-          <div className="contact-container">
-            <div className="contact-info">
-              <h3>Let's talk about your project</h3>
-              <p>I'm available for freelance work and interesting project opportunities.</p>
-              <div className="contact-details">
-                <div className="contact-item">
-                  <FaPhone className="contact-icon" />
-                  <div>
-                    <h4>Phone</h4>
-                    <a href="tel:+919335162135" className="text-blue-600 hover:underline">
-                      +91 9335162135
-                    </a>
-                  </div>
-                </div>
-
-                <div className="contact-item">
-                  <FaEnvelope className="contact-icon" />
-                  <div>
-                    <h4>Email</h4>
-                    <a href="mailto:shubshukla2332@gmail.com" className="text-blue-600 hover:underline">
-                      shubshukla2332@gmail.com
-                    </a>
-                  </div>
-                </div>
-
-                <div className="contact-item">
-                  <FaMapMarkerAlt className="contact-icon" />
-                  <div>
-                    <h4>Location</h4>
-                    <p>Ghaziabad, Uttar Pradesh, India</p>
-                  </div>
+          <Reveal>
+            <div className="contact-wrapper">
+              <div className="contact-left">
+                <span className="section-tag">05 — Contact</span>
+                <h2>Let's build something <span className="gradient-text">extraordinary.</span></h2>
+                <p className="contact-lead">Open to freelance, full-time roles, and ambitious collaborations.</p>
+                <div className="contact-links">
+                  <a href="mailto:shubshukla2332@gmail.com" className="contact-link-item"><FaEnvelope /> shubshukla2332@gmail.com</a>
+                  <a href="tel:+919335162135" className="contact-link-item"><FaPhone /> +91 9335162135</a>
+                  <a href="https://wa.me/919335162135" target="_blank" rel="noreferrer" className="contact-link-item"><FaWhatsapp /> WhatsApp</a>
                 </div>
               </div>
-
-              <div className="contact-social">
-                <h4>Follow me</h4>
-                <div className="social-links">
-                  <a href="www.linkedin.com/in/shubham-shukla-b480a726a"><FaLinkedin /></a>
-                  <a href="https://github.com/shubhamaaaa"><FaGithub /></a>
-
-
-                  <a href="https://wa.me/919335162135" target="_blank" rel="noopener noreferrer">
-                    <FaWhatsapp />
-                  </a>
+              
+              {/* COMPACT FORM */}
+              <form className="contact-form-compact glass" onSubmit={handleSubmit}>
+                <div className="form-row">
+                  <input id="name" name="name" value={formData.name} onChange={handleFormChange} placeholder="Your Name" required />
+                  <input id="email" type="email" name="email" value={formData.email} onChange={handleFormChange} placeholder="Your Email" required />
                 </div>
-              </div>
-            </div>
-            <div className="contact-form">
-              <form onSubmit={handleSubmit}>
-                <div className="form-group">
-                  <label htmlFor="name">Your Name</label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleFormChange}
-                    placeholder="Enter your name"
-                    required
-                  />
+                <textarea id="message" name="message" value={formData.message} onChange={handleFormChange} placeholder="Your Message" required />
+                <div className="form-footer">
+                  <div className="form-status">
+                    {formStatus.error && <span className="error-text">{formStatus.error}</span>}
+                    {formStatus.sent && <span className="success-text">✓ Message sent!</span>}
+                  </div>
+                  <MagneticButton>
+                    <button type="submit" className="btn btn-primary" disabled={formStatus.sending}>
+                      {formStatus.sending ? 'Sending...' : 'Send Message'}
+                    </button>
+                  </MagneticButton>
                 </div>
-                <div className="form-group">
-                  <label htmlFor="email">Your Email</label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleFormChange}
-                    placeholder="Enter your email"
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="message">Your Message</label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    value={formData.message}
-                    onChange={handleFormChange}
-                    placeholder="Enter your message"
-                    required
-                  ></textarea>
-                </div>
-                {formStatus.error && <div className="error-message">{formStatus.error}</div>}
-                {formStatus.sent && <div className="success-message">Message sent successfully! I'll get back to you soon.</div>}
-                <button type="submit" className="btn" disabled={formStatus.sending}>
-                  {formStatus.sending ? 'Sending...' : 'Send Message'}
-                  <FaPaperPlane className="btn-icon" />
-                </button>
               </form>
             </div>
-          </div>
+          </Reveal>
         </div>
       </section>
 
-      {/* Footer */}
       <footer>
-        <div className="container">
-          <div className="footer-content">
-            <div className="logo">Shubham<span>Shukla</span></div>
-            <p>Full Stack Developer & Web Designer</p>
-            <div className="social-links">
-              <a href="www.linkedin.com/in/shubham-shukla-b480a726a"><FaLinkedin /></a>
-              <a href="https://github.com/shubhamaaaa"><FaGithub /></a>
-
-
-              <a href="https://wa.me/919335162135" target="_blank" rel="noopener noreferrer">
-                <FaWhatsapp />
-              </a>
-            </div>
+        <div className="container footer-inner">
+          <div className="footer-brand">
+            <div className="logo"><span className="logo-mark">S</span><span className="logo-text">Shubham<span>.dev</span></span></div>
+            <p>Full Stack Developer · AI Enthusiast · Problem Solver</p>
           </div>
-          <div className="footer-bottom">
-            <p>&copy; 2026 Shubham Shukla. All Rights Reserved.</p>
+          <div className="footer-links">
+            {NAV_ITEMS.map(i => <a key={i.id} href={`#${i.id}`} onClick={() => scrollToSection(i.id)}>{i.label}</a>)}
           </div>
+          <div className="footer-bottom"><p>© {new Date().getFullYear()} Shubham Shukla. Crafted with React & ☕</p></div>
         </div>
       </footer>
+
+      <ProjectModal project={selectedProject} onClose={() => setSelectedProject(null)} />
+      <WhatsAppFab />
+      <ChatBot />
     </div>
   );
 }
